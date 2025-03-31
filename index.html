@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Sidharth's Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .light-mode {
+            background-color: white;
+            color: black;
+        }
+        .intro-container {
+            max-width: 800px;
+            text-align: center;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+        .toggle-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background-color: transparent;
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid white;
+            transition: transform 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .tagline {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #aaa;
+        }
+        .welcome-text {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .skill-tag:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .cta-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+        .primary-cta {
+            background: white;
+            color: black;
+        }
+        .secondary-cta {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+        .typing-effect {
+            border-right: 2px solid white;
+            white-space: nowrap;
+            overflow: hidden;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        .social-icons {
+            margin-top: 20px;
+        }
+        .social-icons a {
+            font-size: 1.5em;
+            margin: 0 10px;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .social-icons a:hover {
+            transform: scale(1.2);
+            color: #aaa;
+        }
+        .hidden {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 1s;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .light-mode .skill-tag {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .light-mode .secondary-cta {
+            color: black;
+            border: 1px solid black;
+        }
+        .light-mode .primary-cta {
+            background: black;
+            color: white;
+        }
+        .light-mode .social-icons a {
+            color: black;
+        }
+        .light-mode .toggle-button {
+            color: black;
+        }
+        .light-mode .profile-pic {
+            border-color: black;
+        }
+
+        /* Scroll to bottom button styles */
+        .scroll-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .scroll-btn.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .scroll-btn i {
+            color: white;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .scroll-btn:hover i {
+            transform: translateY(3px);
+        }
+
+        .light-mode .scroll-btn {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .scroll-btn:hover {
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .scroll-btn i {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-button" onclick="toggleMode()">🌙</button>
+    <button class="scroll-btn" onclick="scrollToBottom()" id="scrollBtn">
+        <i class="fas fa-chevron-down"></i>
+    </button>
+    
+    <div class="intro-container fade-in" id="welcome-screen">
+        <img src="download.jpeg" alt="Sidharth Ganesh" class="profile-pic">
+        <h1>Hello, I'm <span class="typing-effect">Sidharth Ganesh</span></h1>
+        <p class="tagline">Developer • Innovator • Technology Enthusiast</p>
+        
+        <div class="welcome-text">
+            <p>Welcome to my digital space! I'm a passionate developer with expertise in web technologies and automation solutions. I love creating innovative projects and continuously expanding my skills.</p>
+        </div>
+        
+        <div class="skill-tags">
+            <span class="skill-tag">HTML/CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">Java</span>
+            <span class="skill-tag">IoT</span>
+            <span class="skill-tag">Automation</span>
+        </div>
+        
+        <div class="social-icons">
+            <a href="https://github.com/Sid-Java" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/sidharth-ganesh-4650b8293" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://www.instagram.com/sidddharth_g/" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+        
+        <div class="cta-buttons">
+            <button class="cta-button primary-cta" onclick="showQuestion()">Learn More About Me</button>
+        </div>
+    </div>
+    
+    <div class="intro-container hidden" id="question-screen">
+        <h1>What would you like to explore?</h1>
+        <p>I'd be happy to share more about my background, showcase my projects, or discuss potential collaborations.</p>
+        
+        <div class="cta-buttons">
+            <button class="cta-button primary-cta" onclick="showSpecificSection('resume')">View Resume</button>
+            <button class="cta-button secondary-cta" onclick="showSpecificSection('projects')">See My Projects</button>
+            <button class="cta-button secondary-cta" onclick="showSpecificSection('about')">About Me</button>
+            <button class="cta-button secondary-cta" onclick="showSpecificSection('contact')">Get In Touch</button>
+            <button class="cta-button secondary-cta" onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMode() {
+            document.body.classList.toggle("light-mode");
+            const toggleBtn = document.querySelector(".toggle-button");
+            toggleBtn.textContent = document.body.classList.contains("light-mode") ? "🌙" : "☀️";
+        }
+        
+        function showQuestion() {
+            document.getElementById("welcome-screen").classList.add("hidden");
+            const questionScreen = document.getElementById("question-screen");
+            questionScreen.classList.remove("hidden");
+            questionScreen.classList.add("fade-in");
+        }
+        
+        function goBack() {
+            document.getElementById("question-screen").classList.add("hidden");
+            const welcomeScreen = document.getElementById("welcome-screen");
+            welcomeScreen.classList.remove("hidden");
+            welcomeScreen.classList.add("fade-in");
+        }
+        
+        // Check URL hash on page load
+        window.addEventListener('load', function() {
+            if (window.location.hash === '#question-screen') {
+                showQuestion();
+            }
+        });
+        
+        function showSpecificSection(section) {
+            switch(section) {
+                case 'contact':
+                    // Navigate to your separate contact page
+                    window.location.href = "contact.html";
+                    break;
+                case 'projects':
+                    // Navigate to projects section in main portfolio
+                    window.location.href = "projects.html";
+                    break;
+                case 'about':
+                    // Navigate to about section in main portfolio
+                    window.location.href = "about.html";
+                    break;
+                case 'resume':
+                    // Navigate to resume page (if you have one)
+                    window.location.href = "resume.html";
+                    break;
+                case 'blog':
+                    // Navigate to blog page (if you have one)
+                    window.location.href = "blog.html";
+                    break;
+                default:
+                    // Default case - navigate to section in main portfolio
+                    window.location.href = "index.html#" + section;
+            }
+        }
+        
+        // Scroll to bottom functionality
+        window.onscroll = function() {
+            const scrollBtn = document.getElementById('scrollBtn');
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Show button when scrolled down 100px
+            if (scrollTop > 100) {
+                scrollBtn.classList.add('visible');
+            } else {
+                scrollBtn.classList.remove('visible');
+            }
+            
+            // Hide button when near bottom
+            if (scrollTop + windowHeight > documentHeight - 100) {
+                scrollBtn.classList.remove('visible');
+            }
+        };
+
+        function scrollToBottom() {
+            const documentHeight = document.documentElement.scrollHeight;
+            window.scrollTo({
+                top: documentHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Type effect animation
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelector(".typing-effect").style.animation = "none";
+            }, 4000);
+        });
+    </script>
+</body>
+</html>

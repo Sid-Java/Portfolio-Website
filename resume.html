@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Sidharth Ganesh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0a192f;
+            color: #8892b0;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            color: #64ffda;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #ccd6f6;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .section h2 {
+            color: #ccd6f6;
+            font-family: 'Poppins', sans-serif;
+            border-bottom: 2px solid #64ffda;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .experience-item, .education-item {
+            margin-bottom: 25px;
+        }
+
+        .experience-item h3, .education-item h3 {
+            color: #e6f1ff;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            color: #64ffda;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .skill-tag {
+            background: rgba(100, 255, 218, 0.1);
+            color: #64ffda;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            background: rgba(100, 255, 218, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .contact-info {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .contact-info a {
+            color: #64ffda;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        .back-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #64ffda;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button i {
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .back-button:hover i {
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html#question-screen" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back</span>
+    </a>
+    <div class="container">
+        <div class="header">
+            <h1>Sidharth Ganesh</h1>
+            <div class="subtitle">Software Developer</div>
+        </div>
+
+        <div class="section">
+            <h2>Summary</h2>
+            <p>A passionate computer science student with strong programming fundamentals and a keen interest in software development. Currently pursuing B.Tech in Computer Science Engineering with Specialization in AI & Robotics at VIT Chennai. Proficient in multiple programming languages and eager to apply technical skills in real-world projects.</p>
+        </div>
+
+        <div class="section">
+            <h2>Projects & Achievements</h2>
+            <div class="experience-item">
+                <h3>Academic Projects</h3>
+                <div class="date">VIT Chennai • 2023 - Present</div>
+                <ul>
+                    <li>Developed a weight-balancing line-following robot using ESP32 microcontroller, MPU6050 gyroscope, and IR sensors</li>
+                    <li>Developing a machine learning model for predictive analytics</li>
+                    <li>Created a responsive portfolio website using HTML, CSS, and JavaScript</li>
+                </ul>
+            </div>
+            
+            <div class="experience-item">
+                <h3>Technical Achievements</h3>
+                <div class="date">2023 - Present</div>
+                <ul>
+                    <li>Active participant in college technical events and hackathons</li>
+                    <li>Member of VIT's Technical Club</li>
+                    <li>Solved 200+ programming problems on various coding platforms</li>
+                    <li>Contributed to open-source projects on GitHub</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Education</h2>
+            <div class="education-item">
+                <h3>B.Tech in Computer Science Engineering</h3>
+                <div class="date">Vellore Institute of Technology, Chennai • 2023 - 2027</div>
+                <p>Specialization in AI & Robotics</p>
+                <p>Relevant coursework: Data Structures, Algorithms, Web Development, Database Management, Artificial Intelligence, Machine Learning</p>
+            </div>
+
+            <div class="education-item">
+                <h3>High School</h3>
+                <div class="date">St Francis School • 2017 - 2023</div>
+                <p>Completed 12th grade with Computer Science stream</p>
+                <p>Key achievements:</p>
+                <ul>
+                    <li>Active participant in school's technical events</li>
+                    <li>Member of the school's IT club</li>
+                    <li>Participated in various coding competitions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-tag">Java</div>
+                <div class="skill-tag">C/C++</div>
+                <div class="skill-tag">Python</div>
+                <div class="skill-tag">HTML/CSS</div>
+                <div class="skill-tag">JavaScript</div>
+                <div class="skill-tag">Git</div>
+                <div class="skill-tag">SQL</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Languages</h2>
+            <div class="skills-grid">
+                <div class="skill-tag">
+                    <i class="fas fa-code"></i> Programming Languages
+                    <ul style="list-style: none; padding: 0; margin: 5px 0 0 0; font-size: 0.9em;">
+                        <li>Java (Advanced)</li>
+                        <li>C/C++ (Advanced)</li>
+                        <li>Python (Fluent)</li>
+                        <li>HTML/CSS/JS (Proficient)</li>
+                    </ul>
+                </div>
+                <div class="skill-tag">
+                    <i class="fas fa-language"></i> Natural Languages
+                    <ul style="list-style: none; padding: 0; margin: 5px 0 0 0; font-size: 0.9em;">
+                        <li>English (Fluent)</li>
+                        <li>Malayalam (Native)</li>
+                        <li>Tamil (Conversational)</li>
+                        <li>German (Basic)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-info">
+            <a href="mailto:sidharthganesh07@gmail.com"><i class="fas fa-envelope"></i> Email</a>
+            <a href="https://www.linkedin.com/in/sidharth-ganesh-4650b8293" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+            <a href="https://github.com/Sid-Java" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+            <a href="https://www.instagram.com/sidddharth_g/" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+        </div>
+    </div>
+</body>
+</html>

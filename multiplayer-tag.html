@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Tag Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0f172a;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        canvas {
+            display: block;
+            background-color: #1e293b;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 95vw;
+            max-height: 80vh;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            pointer-events: none;
+        }
+        
+        #score {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        
+        #controlsInfo {
+            position: absolute;
+            bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #f8fafc;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 24px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2563eb;
+            transform: scale(1.05);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        #particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .boost-indicator {
+            position: absolute;
+            height: 10px;
+            background-color: #22c55e;
+            border-radius: 5px;
+            transition: width 0.2s;
+        }
+        
+        #player1Boost {
+            left: 20px;
+            bottom: 20px;
+            width: 100px;
+        }
+        
+        #player2Boost {
+            right: 20px;
+            bottom: 20px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div id="score">
+                <span id="player1Score">Player 1: 0</span> | <span id="player2Score">Player 2: 0</span>
+            </div>
+            <div id="timer">60</div>
+        </div>
+        
+        <div id="controlsInfo">
+            <p>Player 1 (WASD to move, SHIFT to boost) | Player 2 (Arrow Keys to move, SPACE to boost)</p>
+        </div>
+        
+        <div id="player1Boost" class="boost-indicator"></div>
+        <div id="player2Boost" class="boost-indicator"></div>
+        
+        <div id="startScreen">
+            <h1>Multiplayer Tag</h1>
+            <p>Tag your opponent to score points! The chaser (red) earns points by tagging.</p>
+            <p>Avoid being tagged if you're blue!</p>
+            <button id="startButton">Start Game</button>
+        </div>
+        
+        <div id="gameOverScreen" class="hidden">
+            <h1>Game Over!</h1>
+            <p id="winnerText">Player 1 wins!</p>
+            <p id="finalScore">Final Score: 0 - 0</p>
+            <button id="restartButton">Play Again</button>
+        </div>
+        
+        <canvas id="particles"></canvas>
+    </div>
+    
+    <script>
+        // Game canvas setup
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 800;
+        canvas.height = 600;
+        
+        // Particles canvas setup
+        const particlesCanvas = document.getElementById("particles");
+        const particlesCtx = particlesCanvas.getContext("2d");
+        particlesCanvas.width = window.innerWidth;
+        particlesCanvas.height = window.innerHeight;
+        
+        // Game variables
+        const playerSize = 40;
+        let players = [
+            { 
+                x: 100, 
+                y: 100, 
+                color: "red", 
+                trail: [], 
+                score: 0,
+                boost: 100,
+                boosting: false,
+                keys: { up: 'w', down: 's', left: 'a', right: 'd', boost: 'Shift' }
+            },
+            { 
+                x: canvas.width - 100, 
+                y: canvas.height - 100, 
+                color: "blue", 
+                trail: [], 
+                score: 0,
+                boost: 100,
+                boosting: false,
+                keys: { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', boost: ' ' }
+            }
+        ];
+        
+        let particles = [];
+        let obstacles = [];
+        let powerUps = [];
+        let chaserIndex = 0;
+        let baseSpeed = 4;
+        let boostSpeed = 7;
+        let gameTime = 60;
+        let gameRunning = false;
+        let keysPressed = {};
+        let tagCooldown = 0;
+        let lastTimestamp = 0;
+        let gameLoop;
+        
+        // UI elements
+        const startScreen = document.getElementById("startScreen");
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        const timerElement = document.getElementById("timer");
+        const player1ScoreElement = document.getElementById("player1Score");
+        const player2ScoreElement = document.getElementById("player2Score");
+        const player1BoostElement = document.getElementById("player1Boost");
+        const player2BoostElement = document.getElementById("player2Boost");
+        const winnerTextElement = document.getElementById("winnerText");
+        const finalScoreElement = document.getElementById("finalScore");
+        
+        // Event listeners
+        window.addEventListener("keydown", (e) => {
+            keysPressed[e.key] = true;
+            // Prevent scrolling when using arrow keys
+            if(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        window.addEventListener("keyup", (e) => keysPressed[e.key] = false);
+        
+        document.getElementById("startButton").addEventListener("click", startGame);
+        document.getElementById("restartButton").addEventListener("click", startGame);
+        
+        // Game initialization
+        function startGame() {
+            // Reset game state
+            players[0].x = 100;
+            players[0].y = 100;
+            players[0].color = "red";
+            players[0].score = 0;
+            players[0].boost = 100;
+            players[0].trail = [];
+            
+            players[1].x = canvas.width - 100;
+            players[1].y = canvas.height - 100;
+            players[1].color = "blue";
+            players[1].score = 0;
+            players[1].boost = 100;
+            players[1].trail = [];
+            
+            chaserIndex = 0;
+            gameTime = 60;
+            tagCooldown = 0;
+            
+            // Create obstacles
+            obstacles = [
+                { x: canvas.width/2 - 100, y: canvas.height/2 - 25, width: 200, height: 50 },
+                { x: canvas.width/4 - 25, y: canvas.height/4 - 25, width: 50, height: 50 },
+                { x: 3*canvas.width/4 - 25, y: 3*canvas.height/4 - 25, width: 50, height: 50 }
+            ];
+            
+            // Create power-ups periodically
+            powerUps = [];
+            
+            // Hide start screen, update UI
+            startScreen.classList.add("hidden");
+            gameOverScreen.classList.add("hidden");
+            updateScoreDisplay();
+            
+            // Start game loop
+            gameRunning = true;
+            lastTimestamp = performance.now();
+            gameLoop = requestAnimationFrame(updateGame);
+        }
+        
+        function updateGame(timestamp) {
+            if (!gameRunning) return;
+            
+            // Calculate delta time for smooth animations
+            const deltaTime = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+            
+            // Update timer
+            if (gameTime > 0) {
+                gameTime -= deltaTime;
+                timerElement.textContent = Math.ceil(gameTime);
+                
+                if (gameTime <= 0) {
+                    endGame();
+                    return;
+                }
+            }
+            
+            // Power-up spawning logic
+            if (Math.random() < 0.005 && powerUps.length < 3) {
+                spawnPowerUp();
+            }
+            
+            // Update tag cooldown
+            if (tagCooldown > 0) {
+                tagCooldown -= deltaTime;
+            }
+            
+            // Process player movement and actions
+            movePlayers(deltaTime);
+            checkCollision();
+            checkPowerUpCollection();
+            updateBoostIndicators();
+            
+            // Render game elements
+            drawGame();
+            
+            // Continue game loop
+            gameLoop = requestAnimationFrame(updateGame);
+        }
+        
+        function movePlayers(deltaTime) {
+            players.forEach((p, i) => {
+                // Store previous position for trail
+                p.trail.push({x: p.x, y: p.y});
+                if (p.trail.length > 20) {
+                    p.trail.shift();
+                }
+                
+                // Apply boost if active
+                let currentSpeed = baseSpeed;
+                
+                // Check boost key
+                if (keysPressed[p.keys.boost] && p.boost > 0) {
+                    p.boosting = true;
+                    currentSpeed = boostSpeed;
+                    p.boost = Math.max(0, p.boost - 30 * deltaTime);
+                } else {
+                    p.boosting = false;
+                    p.boost = Math.min(100, p.boost + 10 * deltaTime);
+                }
+                
+                // Move player based on key presses
+                let dx = 0, dy = 0;
+                if (keysPressed[p.keys.up]) dy -= 1;
+                if (keysPressed[p.keys.down]) dy += 1;
+                if (keysPressed[p.keys.left]) dx -= 1;
+                if (keysPressed[p.keys.right]) dx += 1;
+                
+                // Normalize diagonal movement
+                if (dx !== 0 && dy !== 0) {
+                    const magnitude = Math.sqrt(dx * dx + dy * dy);
+                    dx /= magnitude;
+                    dy /= magnitude;
+                }
+                
+                // Apply movement
+                p.x += dx * currentSpeed;
+                p.y += dy * currentSpeed;
+                
+                // Handle collisions with obstacles
+                obstacles.forEach(obstacle => {
+                    if (isColliding(p, obstacle)) {
+                        // Simple collision response - push player away
+                        const overlapX = (p.x < obstacle.x) ? 
+                            p.x + playerSize - obstacle.x : 
+                            obstacle.x + obstacle.width - p.x;
+                            
+                        const overlapY = (p.y < obstacle.y) ? 
+                            p.y + playerSize - obstacle.y : 
+                            obstacle.y + obstacle.height - p.y;
+                            
+                        if (overlapX < overlapY) {
+                            p.x += (p.x < obstacle.x) ? -overlapX : overlapX;
+                        } else {
+                            p.y += (p.y < obstacle.y) ? -overlapY : overlapY;
+                        }
+                    }
+                });
+                
+                // Keep player within canvas bounds
+                p.x = Math.max(0, Math.min(canvas.width - playerSize, p.x));
+                p.y = Math.max(0, Math.min(canvas.height - playerSize, p.y));
+            });
+        }
+        
+        function checkCollision() {
+            if (tagCooldown > 0) return;
+            
+            let p1 = players[chaserIndex];
+            let p2 = players[1 - chaserIndex];
+            
+            if (isCollidingCircles(p1, p2)) {
+                // Chaser has tagged the other player
+                p1.score += 1;
+                
+                // Create particles for the tag
+                createExplosion(p2.x + playerSize/2, p2.y + playerSize/2, 20, p1.color);
+                
+                // Swap roles
+                chaserIndex = 1 - chaserIndex;
+                players[chaserIndex].color = "red";
+                players[1 - chaserIndex].color = "blue";
+                
+                // Set cooldown to prevent immediate tag-backs
+                tagCooldown = 1;
+                
+                // Update score display
+                updateScoreDisplay();
+            }
+        }
+        
+        function checkPowerUpCollection() {
+            players.forEach(player => {
+                powerUps = powerUps.filter(powerUp => {
+                    if (isCollidingCircles(player, powerUp, playerSize/2, powerUp.radius)) {
+                        // Apply power-up effect
+                        applyPowerUp(player, powerUp.type);
+                        return false;
+                    }
+                    return true;
+                });
+            });
+        }
+        
+        function applyPowerUp(player, type) {
+            switch(type) {
+                case 'speed':
+                    // Create temporary speed boost
+                    player.boost = 100;
+                    createExplosion(player.x + playerSize/2, player.y + playerSize/2, 10, '#22c55e');
+                    break;
+                case 'shield':
+                    // Create temporary shield
+                    player.shield = true;
+                    setTimeout(() => { player.shield = false; }, 5000);
+                    createExplosion(player.x + playerSize/2, player.y + playerSize/2, 10, '#3b82f6');
+                    break;
+            }
+        }
+        
+        function spawnPowerUp() {
+            // Find a position away from obstacles
+            let validPosition = false;
+            let x, y, attempts = 0;
+            const powerUpRadius = 15;
+            
+            while (!validPosition && attempts < 20) {
+                x = Math.random() * (canvas.width - 2 * powerUpRadius) + powerUpRadius;
+                y = Math.random() * (canvas.height - 2 * powerUpRadius) + powerUpRadius;
+                
+                validPosition = true;
+                
+                // Check if too close to obstacles
+                for (let obstacle of obstacles) {
+                    const dx = x - (obstacle.x + obstacle.width/2);
+                    const dy = y - (obstacle.y + obstacle.height/2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 50) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+                
+                attempts++;
+            }
+            
+            if (validPosition) {
+                const types = ['speed', 'shield'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                powerUps.push({
+                    x: x - powerUpRadius,
+                    y: y - powerUpRadius,
+                    radius: powerUpRadius,
+                    type: type,
+                    pulse: 0
+                });
+            }
+        }
+        
+        function updateBoostIndicators() {
+            player1BoostElement.style.width = `${players[0].boost}px`;
+            player2BoostElement.style.width = `${players[1].boost}px`;
+            
+            // Change color based on boost level
+            const getBoostColor = (boost) => {
+                if (boost < 30) return '#ef4444'; // Red when low
+                if (boost < 70) return '#eab308'; // Yellow when medium
+                return '#22c55e'; // Green when high
+            };
+            
+            player1BoostElement.style.backgroundColor = getBoostColor(players[0].boost);
+            player2BoostElement.style.backgroundColor = getBoostColor(players[1].boost);
+        }
+        
+        function drawGame() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw obstacles
+            ctx.fillStyle = "#334155";
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+            
+            // Draw player trails
+            players.forEach((player, index) => {
+                const trailColor = (index === chaserIndex) ? "rgba(255, 0, 0, 0.2)" : "rgba(0, 0, 255, 0.2)";
+                
+                ctx.save();
+                for (let i = 0; i < player.trail.length; i++) {
+                    const pos = player.trail[i];
+                    const alpha = i / player.trail.length;
+                    ctx.globalAlpha = alpha * 0.5;
+                    ctx.fillStyle = trailColor;
+                    
+                    const size = playerSize * (0.5 + 0.5 * alpha);
+                    ctx.beginPath();
+                    ctx.arc(
+                        pos.x + playerSize/2, 
+                        pos.y + playerSize/2, 
+                        size/2, 0, Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
+            
+            // Draw power-ups
+            powerUps.forEach(powerUp => {
+                // Update pulse animation
+                powerUp.pulse = (powerUp.pulse + 0.05) % (Math.PI * 2);
+                const pulseFactor = 1 + 0.1 * Math.sin(powerUp.pulse);
+                
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(
+                    powerUp.x + powerUp.radius, 
+                    powerUp.y + powerUp.radius, 
+                    powerUp.radius * pulseFactor, 0, Math.PI * 2
+                );
+                
+                // Different styles based on power-up type
+                if (powerUp.type === 'speed') {
+                    ctx.fillStyle = '#22c55e'; // Green for speed boost
+                } else if (powerUp.type === 'shield') {
+                    ctx.fillStyle = '#3b82f6'; // Blue for shield
+                }
+                
+                ctx.fill();
+                
+                // Draw icon
+                ctx.fillStyle = 'white';
+                ctx.font = '15px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const icon = powerUp.type === 'speed' ? '⚡' : '🛡️';
+                ctx.fillText(
+                    icon, 
+                    powerUp.x + powerUp.radius, 
+                    powerUp.y + powerUp.radius
+                );
+                
+                ctx.restore();
+            });
+            
+            // Draw players
+            players.forEach((player, index) => {
+                ctx.save();
+                
+                // Draw player
+                ctx.fillStyle = player.color;
+                
+                // Draw as circle instead of rectangle
+                ctx.beginPath();
+                ctx.arc(
+                    player.x + playerSize/2, 
+                    player.y + playerSize/2, 
+                    playerSize/2, 0, Math.PI * 2
+                );
+                ctx.fill();
+                
+                // Add glowing effect if boosting
+                if (player.boosting) {
+                    ctx.globalAlpha = 0.5;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = player.color;
+                    ctx.beginPath();
+                    ctx.arc(
+                        player.x + playerSize/2, 
+                        player.y + playerSize/2, 
+                        playerSize/2 + 5, 0, Math.PI * 2
+                    );
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+                
+                // Draw shield effect if active
+                if (player.shield) {
+                    ctx.globalAlpha = 0.3;
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(
+                        player.x + playerSize/2, 
+                        player.y + playerSize/2, 
+                        playerSize/2 + 10, 0, Math.PI * 2
+                    );
+                    ctx.stroke();
+                }
+                
+                // Draw player number in center
+                ctx.fillStyle = "white";
+                ctx.font = "bold 16px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(
+                    (index + 1).toString(), 
+                    player.x + playerSize/2, 
+                    player.y + playerSize/2
+                );
+                
+                ctx.restore();
+            });
+            
+            // Draw particles
+            updateParticles();
+        }
+        
+        function updateParticles() {
+            particlesCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+            
+            // Update and draw particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.life -= 0.02;
+                
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+                
+                p.x += p.vx;
+                p.y += p.vy;
+                p.size *= 0.95;
+                
+                particlesCtx.save();
+                particlesCtx.globalAlpha = p.life;
+                particlesCtx.fillStyle = p.color;
+                particlesCtx.beginPath();
+                particlesCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                particlesCtx.fill();
+                particlesCtx.restore();
+            }
+        }
+        
+        function createExplosion(x, y, particleCount, color) {
+            for (let i = 0; i < particleCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1 + Math.random() * 3;
+                
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: 3 + Math.random() * 4,
+                    color: color,
+                    life: 1
+                });
+            }
+        }
+        
+        function isCollidingCircles(obj1, obj2, radius1 = playerSize/2, radius2 = playerSize/2) {
+            const dx = (obj1.x + radius1) - (obj2.x + radius2);
+            const dy = (obj1.y + radius1) - (obj2.y + radius2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance < radius1 + radius2;
+        }
+        
+        function isColliding(player, rect) {
+            return player.x < rect.x + rect.width &&
+                   player.x + playerSize > rect.x &&
+                   player.y < rect.y + rect.height &&
+                   player.y + playerSize > rect.y;
+        }
+        
+        function updateScoreDisplay() {
+            player1ScoreElement.textContent = `Player 1: ${players[0].score}`;
+            player2ScoreElement.textContent = `Player 2: ${players[1].score}`;
+        }
+        
+        function endGame() {
+            gameRunning = false;
+            cancelAnimationFrame(gameLoop);
+            
+            // Determine winner
+            let winner, winnerScore, loserScore;
+            if (players[0].score > players[1].score) {
+                winner = "Player 1";
+                winnerScore = players[0].score;
+                loserScore = players[1].score;
+            } else if (players[1].score > players[0].score) {
+                winner = "Player 2";
+                winnerScore = players[1].score;
+                loserScore = players[0].score;
+            } else {
+                winner = "It's a tie";
+                winnerScore = players[0].score;
+                loserScore = players[1].score;
+            }
+            
+            // Update game over screen
+            winnerTextElement.textContent = `${winner} wins!`;
+            finalScoreElement.textContent = `Final Score: ${players[0].score} - ${players[1].score}`;
+            gameOverScreen.classList.remove("hidden");
+        }
+        
+        // Resize handler for particles canvas
+        window.addEventListener('resize', () => {
+            particlesCanvas.width = window.innerWidth;
+            particlesCanvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html> 

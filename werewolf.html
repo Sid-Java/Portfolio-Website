@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werewolf Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #64ffda;
+            --background-color: #0a192f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #fff;
+            --danger-color: #ff4d4d;
+            --success-color: #4dff4d;
+        }
+
+        :root[data-theme="light"] {
+            --primary-color: #2c3e50;
+            --background-color: #f5f6fa;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #2c3e50;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-setup {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .player-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-card.dead {
+            opacity: 0.5;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        .player-card.werewolf {
+            border: 2px solid var(--danger-color);
+        }
+
+        .player-card.seer {
+            border: 2px solid var(--success-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: var(--background-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .game-phase {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        .role-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .vote-section {
+            margin-top: 20px;
+        }
+
+        .vote-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .vote-option {
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .vote-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .vote-option.selected {
+            background: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        .card-flip {
+            perspective: 1000px;
+            width: 200px;
+            height: 150px;
+            margin: 20px auto;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .card-flip.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        .role-reveal {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .game-log {
+            margin-top: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .game-log p {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <a href="projects.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Projects</span>
+    </a>
+
+    <div class="container">
+        <div class="game-setup">
+            <h2>Werewolf Game</h2>
+            <div class="game-phase">Phase: <span id="phase">Setup</span></div>
+            
+            <div class="controls">
+                <button id="startGame" onclick="startGame()" disabled>Start Game</button>
+                <button id="addPlayer" onclick="addPlayer()">Add Player</button>
+                <button id="resetGame" onclick="resetGame()">Reset Game</button>
+            </div>
+
+            <div class="player-list" id="playerList">
+                <!-- Players will be added here -->
+            </div>
+        </div>
+
+        <div class="vote-section" id="voteSection" style="display: none;">
+            <h3 id="actionTitle">Select a Player</h3>
+            <div class="vote-options" id="voteOptions">
+                <!-- Vote options will be added here -->
+            </div>
+            <button onclick="confirmAction()" id="confirmBtn" disabled>Confirm</button>
+        </div>
+
+        <div class="game-log" id="gameLog">
+            <h3>Game Log</h3>
+            <div id="logEntries"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <div class="role-icon">
+                <i class="fas fa-question"></i>
+            </div>
+            <h3>Your Role</h3>
+            <p id="roleText"></p>
+            <div class="card-flip" id="cardFlip" style="display: none;">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div id="cardFrontName">Player</div>
+                    </div>
+                    <div class="card-back">
+                        <div class="role-reveal" id="cardBackRole">Role</div>
+                    </div>
+                </div>
+            </div>
+            <button id="modalButton" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let players = [];
+        let gameStarted = false;
+        let nightPhase = false;
+        let currentTurn = '';
+        let selectedPlayer = null;
+        let killedThisNight = null;
+        let nightActions = {};
+
+        // Define roles
+        const roles = {
+            werewolf: { name: 'Werewolf', icon: 'fa-moon', color: '#ff4d4d', description: 'Hunt a player during the night.' },
+            villager: { name: 'Villager', icon: 'fa-user', color: '#ffffff', description: 'Vote during the day to eliminate werewolves.' }
+        };
+
+        // Add a player to the game
+        function addPlayer() {
+            if (gameStarted) {
+                addLogEntry("Can't add players after game has started");
+                return;
+            }
+
+            if (players.length >= 8) {
+                addLogEntry("Maximum 8 players allowed");
+                return;
+            }
+
+            const playerName = prompt('Enter player name:');
+            if (playerName && playerName.trim() !== '') {
+                players.push({
+                    name: playerName,
+                    role: null,
+                    isAlive: true,
+                    id: Date.now() // Unique ID
+                });
+                updatePlayerList();
+                updateGameControls();
+                addLogEntry(`${playerName} joined the game`);
+            }
+        }
+
+        // Update the player list display
+        function updatePlayerList() {
+            const playerList = document.getElementById('playerList');
+            playerList.innerHTML = '';
+
+            players.forEach(player => {
+                const card = document.createElement('div');
+                card.className = 'player-card';
+                
+                if (!player.isAlive) {
+                    card.classList.add('dead');
+                }
+                
+                // Show role only for dead players
+                const roleInfo = player.isAlive ? '' : 
+                    `<div class="player-role">
+                        <i class="fas ${roles[player.role].icon}"></i>
+                        ${roles[player.role].name}
+                    </div>`;
+                
+                card.innerHTML = `
+                    <h3>${player.name}</h3>
+                    <p>${player.isAlive ? 'Alive' : 'Dead'}</p>
+                    ${roleInfo}
+                `;
+                
+                playerList.appendChild(card);
+            });
+        }
+
+        // Update game control buttons
+        function updateGameControls() {
+            const startButton = document.getElementById('startGame');
+            startButton.disabled = !(players.length >= 4 && !gameStarted);
+            
+            document.getElementById('addPlayer').disabled = gameStarted;
+            
+            document.getElementById('phase').textContent = nightPhase ? 'Night' : (gameStarted ? 'Day' : 'Setup');
+        }
+
+        // Start the game
+        function startGame() {
+            if (players.length < 4) {
+                addLogEntry("Need at least 4 players to start");
+                return;
+            }
+            
+            // Assign roles
+            const numWerewolves = Math.max(1, Math.floor(players.length / 4));
+            
+            // Create role array
+            let roleArray = [];
+            
+            // Add werewolves
+            for (let i = 0; i < numWerewolves; i++) {
+                roleArray.push('werewolf');
+            }
+            
+            // Fill the rest with villagers
+            while (roleArray.length < players.length) {
+                roleArray.push('villager');
+            }
+            
+            // Shuffle roles
+            roleArray = shuffleArray(roleArray);
+            
+            // Assign roles to players
+            players.forEach((player, index) => {
+                player.role = roleArray[index];
+            });
+            
+            gameStarted = true;
+            nightPhase = true;
+            
+            updateGameControls();
+            updatePlayerList();
+            addLogEntry("Game started! Night phase begins");
+            
+            // Start with night phase
+            startNightPhase();
+        }
+
+        // Show next player's role from the queue
+        function showNextPlayerRole() {
+            // Get the current player to show
+            if (nightActions.currentRoleIndex >= nightActions.roleQueue.length) {
+                // We've shown all players' roles, now go to the werewolf hunting phase
+                nightActions.rolesShown = true;
+                addLogEntry("All roles revealed. Werewolf hunting begins.");
+                
+                // Find a werewolf for hunting phase
+                const werewolf = players.find(p => p.role === 'werewolf' && p.isAlive);
+                if (werewolf) {
+                    currentTurn = 'werewolf';
+                    setTimeout(() => {
+                        showRolePrompt(werewolf, "Select a player to hunt:");
+                    }, 300);
+                } else {
+                    // No werewolves, go to day
+                    setTimeout(() => {
+                        startDayPhase();
+                    }, 300);
+                }
+                return;
+            }
+            
+            // Get the current player to show
+            const player = nightActions.roleQueue[nightActions.currentRoleIndex];
+            
+            // Set up the modal
+            const modal = document.getElementById('roleModal');
+            const roleText = document.getElementById('roleText');
+            const roleIcon = document.querySelector('.role-icon i');
+            
+            // Set role icon and text
+            roleIcon.className = `fas ${roles[player.role].icon}`;
+            
+            // Style based on role
+            const roleName = roles[player.role].name;
+            const roleEmoji = player.role === 'werewolf' ? '🐺' : '👨‍👩‍👧‍👦';
+            
+            // Set text with styling
+            roleText.innerHTML = `
+                <div style="margin-bottom: 15px; font-size: 1.2em;">
+                    <strong>${player.name}'s Role</strong>
+                </div>
+                <div style="font-size: 1.5em; color: ${roles[player.role].color}; margin-bottom: 10px;">
+                    ${roleEmoji} ${roleName}
+                </div>
+                <div style="font-style: italic; margin-top: 15px;">
+                    ${roles[player.role].description}
+                </div>
+            `;
+            
+            // Update modal button
+            const modalButton = document.getElementById('modalButton');
+            
+            // Clear previous event listeners by cloning and replacing the button
+            const newButton = modalButton.cloneNode(true);
+            modalButton.parentNode.replaceChild(newButton, modalButton);
+            
+            // Check if this is the last player
+            const isLastPlayer = nightActions.currentRoleIndex === nightActions.roleQueue.length - 1;
+            
+            // Set button text
+            newButton.textContent = isLastPlayer ? 'Start Hunting Phase' : 'Next Player';
+            
+            // Set the click handler
+            newButton.addEventListener('click', function() {
+                // Hide modal
+                modal.style.display = 'none';
+                
+                // Move to next player or hunting phase
+                nightActions.currentRoleIndex++;
+                
+                // Check if we should go to hunting phase
+                if (isLastPlayer) {
+                    nightActions.rolesShown = true;
+                    
+                    // Go directly to hunting with werewolf
+                    const werewolf = players.find(p => p.role === 'werewolf' && p.isAlive);
+                    if (werewolf) {
+                        currentTurn = 'werewolf';
+                        addLogEntry("Werewolf hunting phase begins.");
+                        setTimeout(() => {
+                            showRolePrompt(werewolf, "Select a player to hunt:");
+                        }, 300);
+                    } else {
+                        // No werewolves, go to day
+                        setTimeout(() => {
+                            startDayPhase();
+                        }, 300);
+                    }
+                } else {
+                    // Show next player role
+                    setTimeout(() => {
+                        showNextPlayerRole();
+                    }, 300);
+                }
+            });
+            
+            // Show the modal
+            modal.style.display = 'flex';
+        }
+
+        // Show role prompt for night actions
+        function showRolePrompt(player, actionText) {
+            const modal = document.getElementById('roleModal');
+            const roleText = document.getElementById('roleText');
+            const roleIcon = document.querySelector('.role-icon i');
+            const cardFlip = document.getElementById('cardFlip');
+            
+            // Set role icon and text
+            roleIcon.className = `fas ${roles[player.role].icon}`;
+            roleText.innerHTML = `${player.name}, you are the ${roles[player.role].name}!<br>${actionText}`;
+            
+            // Hide card flip initially
+            cardFlip.style.display = 'none';
+            
+            // Update modal button text
+            const modalButton = document.getElementById('modalButton');
+            modalButton.textContent = 'I Understand';
+            
+            // Clear previous event listeners by cloning and replacing the button
+            const newButton = modalButton.cloneNode(true);
+            modalButton.parentNode.replaceChild(newButton, modalButton);
+            
+            // Set the new click handler
+            newButton.addEventListener('click', function() {
+                // ONLY hide the modal but KEEP the voting options visible
+                modal.style.display = 'none';
+                
+                // Don't skip to day phase when closing the modal
+                // The player must select someone to hunt and press confirm
+                // or explicitly press "Skip" to move to day phase
+            });
+            
+            // Show options for actions
+            showPlayerOptions();
+            
+            // Add a Skip button to the vote section for werewolves
+            if (currentTurn === 'werewolf') {
+                const voteSection = document.getElementById('voteSection');
+                const skipButton = document.createElement('button');
+                skipButton.textContent = 'Skip Hunting';
+                skipButton.className = 'skip-button';
+                skipButton.style.marginLeft = '10px';
+                skipButton.style.backgroundColor = '#666';
+                
+                // Clone and replace any existing skip button
+                const existingSkip = voteSection.querySelector('.skip-button');
+                if (existingSkip) {
+                    existingSkip.remove();
+                }
+                
+                skipButton.onclick = function() {
+                    addLogEntry("Werewolf decided not to hunt anyone tonight.");
+                    voteSection.style.display = 'none';
+                    startDayPhase();
+                };
+                
+                // Add skip button beside the confirm button
+                document.getElementById('confirmBtn').parentNode.appendChild(skipButton);
+            }
+            
+            // Display modal
+            modal.style.display = 'flex';
+        }
+
+        // Show player options for night actions or voting
+        function showPlayerOptions() {
+            const voteSection = document.getElementById('voteSection');
+            const voteOptions = document.getElementById('voteOptions');
+            const actionTitle = document.getElementById('actionTitle');
+            
+            // Clear existing options
+            voteOptions.innerHTML = '';
+            
+            // Remove any skip buttons from previous phases
+            const existingSkip = voteSection.querySelector('.skip-button');
+            if (existingSkip) {
+                existingSkip.remove();
+            }
+            
+            // Set action title based on current turn
+            if (currentTurn === 'werewolf') {
+                actionTitle.textContent = 'Select a player to hunt:';
+                actionTitle.style.color = roles.werewolf.color;
+            } else {
+                actionTitle.textContent = 'Vote to eliminate a player:';
+                actionTitle.style.color = '#fff';
+            }
+            
+            // Create options based on current turn
+            const livingPlayers = players.filter(p => p.isAlive);
+            
+            // Check if we have options to display
+            if (livingPlayers.length <= 1) {
+                voteSection.style.display = 'none';
+                return;
+            }
+            
+            livingPlayers.forEach(player => {
+                // Skip werewolves for werewolf action
+                if (currentTurn === 'werewolf' && player.role === 'werewolf') return;
+                
+                const option = document.createElement('div');
+                option.className = 'vote-option';
+                option.textContent = player.name;
+                option.dataset.id = player.id;
+                
+                option.onclick = () => {
+                    selectPlayer(player.id);
+                    document.querySelectorAll('.vote-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                };
+                
+                voteOptions.appendChild(option);
+            });
+            
+            // Reset confirm button
+            document.getElementById('confirmBtn').disabled = true;
+            selectedPlayer = null;
+            
+            // Show vote section
+            voteSection.style.display = 'block';
+            
+            // Add debug log
+            console.log("Vote section displayed:", voteSection.style.display);
+        }
+
+        // Select a player for action
+        function selectPlayer(playerId) {
+            selectedPlayer = playerId;
+            document.getElementById('confirmBtn').disabled = false;
+        }
+
+        // Start the day phase
+        function startDayPhase() {
+            // Set the game phase flag
+            nightPhase = false;
+            
+            // Update UI
+            updateGameControls();
+            updatePlayerList();
+            
+            // Set light theme
+            document.documentElement.setAttribute('data-theme', 'light');
+            
+            // Announce night results with a slight delay
+            setTimeout(() => {
+                if (killedThisNight) {
+                    alert(`${killedThisNight.name} was killed during the night!`);
+                }
+                
+                // Log the day phase start
+                addLogEntry("Day phase begins. Time to vote!");
+                
+                // Set current turn for day voting
+                currentTurn = 'day';
+                
+                // Force display block on the vote section
+                const voteSection = document.getElementById('voteSection');
+                voteSection.style.display = 'block';
+                
+                // Configure voting options
+                displayDayVoting();
+                
+                // Add explicit debug log
+                console.log("DAY PHASE: Vote section visible status:", voteSection.style.display);
+            }, 300);
+        }
+
+        // Display day voting options
+        function displayDayVoting() {
+            // Get UI elements
+            const voteSection = document.getElementById('voteSection');
+            const voteOptions = document.getElementById('voteOptions');
+            const actionTitle = document.getElementById('actionTitle');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            // Clear any previous options
+            voteOptions.innerHTML = '';
+            
+            // Remove any skip buttons from night phase
+            const skipBtn = voteSection.querySelector('.skip-button');
+            if (skipBtn) skipBtn.remove();
+            
+            // Set day voting UI - use dark blue for light theme
+            actionTitle.textContent = 'Vote to eliminate a player:';
+            actionTitle.style.color = document.documentElement.getAttribute('data-theme') === 'light' ? '#2c3e50' : '#ffffff';
+            confirmBtn.disabled = true;
+            
+            // Get living players to vote on
+            const livingPlayers = players.filter(p => p.isAlive);
+            
+            // Check if voting is needed (more than 1 player)
+            if (livingPlayers.length <= 1) {
+                voteSection.style.display = 'none';
+                return;
+            }
+            
+            // Create option for each living player
+            livingPlayers.forEach(player => {
+                const option = document.createElement('div');
+                option.className = 'vote-option';
+                option.textContent = player.name;
+                option.dataset.id = player.id;
+                
+                option.onclick = () => {
+                    // Handle selection
+                    selectedPlayer = player.id;
+                    confirmBtn.disabled = false;
+                    
+                    // Update visual selection
+                    document.querySelectorAll('.vote-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                };
+                
+                voteOptions.appendChild(option);
+            });
+            
+            // Make sure voting section is visible
+            voteSection.style.display = 'block';
+        }
+
+        // Confirm night action or day vote
+        function confirmAction() {
+            if (!selectedPlayer) return;
+            
+            const targetPlayer = players.find(p => p.id === parseInt(selectedPlayer));
+            if (!targetPlayer) return;
+            
+            console.log("Action confirmed:", nightPhase ? "Night" : "Day", "Target:", targetPlayer.name);
+            
+            if (nightPhase) {
+                // Night actions
+                if (currentTurn === 'werewolf') {
+                    // Werewolf hunts a player
+                    huntPlayer(targetPlayer);
+                }
+            } else {
+                // Day voting
+                eliminatePlayer(targetPlayer);
+                
+                // Check if game is over after elimination
+                if (!checkGameEnd()) {
+                    // Start new night phase
+                    setTimeout(() => {
+                        startNightPhase();
+                    }, 1000);
+                }
+            }
+            
+            // Reset selection
+            selectedPlayer = null;
+            document.getElementById('confirmBtn').disabled = true;
+        }
+
+        // Hunt a player (werewolf action)
+        function huntPlayer(player) {
+            // Mark the chosen player as dead
+            player.isAlive = false;
+            killedThisNight = player;
+            
+            // Log the action
+            addLogEntry(`${player.name} was hunted by a werewolf!`);
+            
+            // Hide sections
+            document.getElementById('voteSection').style.display = 'none';
+            document.getElementById('roleModal').style.display = 'none';
+            
+            // Update UI
+            updatePlayerList();
+            
+            // Check if game is over after hunting
+            if (!checkGameEnd()) {
+                // End night phase, start day with a slight delay
+                setTimeout(() => {
+                    startDayPhase();
+                }, 500);
+            }
+        }
+
+        // Eliminate a player (day voting)
+        function eliminatePlayer(player) {
+            // Mark as dead and update UI
+            player.isAlive = false;
+            updatePlayerList();
+            
+            // Log the action
+            addLogEntry(`${player.name} was eliminated by vote!`);
+            
+            // Hide vote section
+            document.getElementById('voteSection').style.display = 'none';
+            
+            // Alert to make the elimination more obvious
+            alert(`${player.name} has been eliminated by vote!`);
+        }
+
+        // Check if the game has ended
+        function checkGameEnd() {
+            const aliveWerewolves = players.filter(p => p.isAlive && p.role === 'werewolf').length;
+            const aliveVillagers = players.filter(p => p.isAlive && p.role !== 'werewolf').length;
+            
+            if (aliveWerewolves === 0) {
+                // Villagers win
+                addLogEntry("Game over! Villagers win!");
+                alert("Game over! Villagers win!");
+                return true;
+            } else if (aliveWerewolves >= aliveVillagers) {
+                // Werewolves win
+                addLogEntry("Game over! Werewolves win!");
+                alert("Game over! Werewolves win!");
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Close the modal - this function is no longer directly attached to buttons
+        function closeModal() {
+            const modal = document.getElementById('roleModal');
+            modal.style.display = 'none';
+        }
+
+        // Reset the game
+        function resetGame() {
+            players = [];
+            gameStarted = false;
+            nightPhase = false;
+            currentTurn = '';
+            selectedPlayer = null;
+            
+            // Reset UI
+            document.getElementById('voteSection').style.display = 'none';
+            document.getElementById('roleModal').style.display = 'none';
+            document.documentElement.setAttribute('data-theme', 'dark');
+            
+            updatePlayerList();
+            updateGameControls();
+            addLogEntry("Game reset. Add players to start a new game.");
+        }
+
+        // Add an entry to the game log
+        function addLogEntry(text) {
+            const logEntries = document.getElementById('logEntries');
+            const entry = document.createElement('p');
+            entry.textContent = text;
+            logEntries.prepend(entry);
+        }
+
+        // Utility function to shuffle an array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Start the night phase
+        function startNightPhase() {
+            nightPhase = true;
+            nightActions = {};
+            killedThisNight = null;
+            updateGameControls();
+            
+            // Set dark theme
+            document.documentElement.setAttribute('data-theme', 'dark');
+            
+            // Show roles first if we haven't already
+            if (!nightActions.rolesShown) {
+                // Reset role queue
+                nightActions.roleQueue = [...players];
+                nightActions.currentRoleIndex = 0;
+                
+                // Show the first player's role
+                addLogEntry("Night phase: Revealing player roles...");
+                showNextPlayerRole();
+            } else {
+                // Roles already shown, go to werewolf hunt
+                const werewolf = players.find(p => p.role === 'werewolf' && p.isAlive);
+                if (werewolf) {
+                    addLogEntry("Werewolf is hunting...");
+                    currentTurn = 'werewolf';
+                    showRolePrompt(werewolf, "Select a player to hunt:");
+                } else {
+                    // No werewolves, go to day
+                    startDayPhase();
+                }
+            }
+        }
+
+        // Initialize the game
+        updateGameControls();
+        addLogEntry("Welcome to Werewolf! Add players to begin.");
+    </script>
+</body>
+</html> 

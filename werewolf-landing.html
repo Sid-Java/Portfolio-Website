@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werewolf Game - Welcome</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #64ffda;
+            --background-color: #0a192f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #fff;
+            --danger-color: #ff4d4d;
+            --success-color: #4dff4d;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .role-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .role-icon {
+            font-size: 2em;
+            color: var(--primary-color);
+        }
+
+        .role-info h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .role-info p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .phase-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .phase-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .phase-card ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .phase-card li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .phase-card li:before {
+            content: "•";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+        }
+
+        .start-button {
+            display: block;
+            width: 200px;
+            margin: 40px auto;
+            padding: 15px 30px;
+            background: var(--primary-color);
+            color: var(--background-color);
+            text-align: center;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .back-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <a href="projects.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Projects</span>
+    </a>
+
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to Werewolf</h1>
+            <p>A social deduction game where players use observation and strategy to identify the werewolves among them.</p>
+        </div>
+
+        <div class="section">
+            <h2>Game Overview</h2>
+            <p>Werewolf is a simplified digital adaptation of the classic social deduction game. Players are assigned secret roles as either Villagers or Werewolves. The objective is to identify and eliminate players through democratic voting. Victory comes through strategy, careful observation, and persuasive discussion!</p>
+        </div>
+
+        <div class="section">
+            <h2>Roles</h2>
+            <div class="role-card">
+                <div class="role-icon">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="role-info">
+                    <h3>Werewolf</h3>
+                    <p>You secretly work against the village. Your goal is to remain undetected while helping eliminate villagers through the voting process. Use deception and misdirection to avoid being caught!</p>
+                </div>
+            </div>
+
+            
+
+            <div class="role-card">
+                <div class="role-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="role-info">
+                    <h3>Villager</h3>
+                    <p>Your goal is to identify and eliminate the werewolves through voting. Pay close attention to discussions, behavior patterns, and voting history to determine who might be hiding their true nature.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Game Phases</h2>
+            <div class="phase-card">
+                <h3>Night Phase</h3>
+                <ul>
+                    <li>All players close their eyes</li>
+                    <li>Werewolves and Villagers sleep through the night (no night elimination)</li>
+                </ul>
+            </div>
+
+            <div class="phase-card">
+                <h3>Day Phase</h3>
+                <ul>
+                    <li>All players open their eyes</li>
+                    <li>Players discuss who they suspect might be a werewolf</li>
+                    <li>Everyone votes to eliminate one player</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How to Win</h2>
+            <ul>
+                <li><strong>Villagers win</strong> by eliminating all werewolves through voting</li>
+                <li><strong>Werewolves win</strong> by avoiding detection until they equal or outnumber the villagers</li>
+            </ul>
+        </div>
+
+        <a href="werewolf.html" class="start-button">Start Game</a>
+    </div>
+</body>
+</html> 

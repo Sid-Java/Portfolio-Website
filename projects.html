@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects - Sidharth Ganesh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .project-card h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #64ffda;
+        }
+
+        .project-card p {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .project-card .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tech-tag {
+            background: rgba(100, 255, 218, 0.1);
+            color: #64ffda;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .tech-tag:hover {
+            background: rgba(100, 255, 218, 0.2);
+            transform: scale(1.05);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .back-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #64ffda;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button i {
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .back-button:hover i {
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html#question-screen" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back</span>
+    </a>
+
+    <div class="container">
+        <h1>My Projects</h1>
+        <div class="projects-grid">
+            <a href="typetest.html">
+                <div class="project-card">
+                    <h2>Typing Test Application</h2>
+                    <p>An advanced typing test that generates custom text based on user-selected topics using AI integration. Features real-time words-per-minute tracking, accuracy statistics, and instantaneous feedback to help improve your typing skills.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">API Integration</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="memory-match.html">
+                <div class="project-card">
+                    <h2>Memory Match Mania</h2>
+                    <p>A fun memory card game featuring adorable animal emojis. Challenge yourself with three difficulty levels, earn points with consecutive matches, and track your performance. Perfect for testing and improving your memory skills!</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Game Logic</span>
+                        <span class="tech-tag">Local Storage</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="finance.html">
+                <div class="project-card">
+                    <h2>Personal Finance Tracker</h2>
+                    <p>A comprehensive financial management tool featuring dynamic charts for visualizing spending patterns, categorized transaction tracking, and budget management. Set financial goals, monitor your spending habits, and gain deeper insights into your financial health.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Chart.js</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="werewolf-landing.html">
+                <div class="project-card">
+                    <h2>Werewolf Game</h2>
+                    <p>A digital adaptation of the classic social deduction game. Take on the role of a Villager, Seer, or Werewolf in this simplified version where the Seer can check player identities during the night phase, followed by group voting during the day phase. No night eliminations—victory is achieved purely through strategic voting!</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Game Logic</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="multiplayer-tag.html">
+                <div class="project-card">
+                    <h2>Multiplayer Tag Game</h2>
+                    <p>An exciting two-player tag game that brings the childhood classic to your browser. Features dynamic game elements like speed boosts, obstacles, and special abilities. Challenge a friend on the same keyboard with intuitive controls and enjoy colorful particle effects that enhance the gaming experience.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Canvas API</span>
+                        <span class="tech-tag">Game Physics</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
