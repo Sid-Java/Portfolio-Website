@@ -59,26 +59,6 @@ The portfolio includes the following projects:
 
 After installation, you can navigate through the portfolio using the menu links. The projects section contains cards that lead to individual project pages with more details and live demos.
 
-📁 Project Structure
-
-portfolio-website/
-├── index.html
-├── projects.html
-├── about.html
-├── contact.html
-├── resume.html
-├── assets/
-│   ├── images/
-│   └── /* other assets */
-└── projects/
-    ├── typetest.html
-    ├── memory-match.html
-    ├── finance.html
-    ├── werewolf.html
-    └── multiplayer-tag.html
-
-
-
 📞 Contact
 Feel free to reach out to me:
 - Email: [sidharthganesh07@gmail.com](mailto:sidharthganesh07@gmail.com)
